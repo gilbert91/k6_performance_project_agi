@@ -1,0 +1,37 @@
+name: CI - K6 Load Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  k6_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar o K6 (novo método)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl gnupg
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Executar teste de performance
+        run: |
+          echo "Rodando teste de carga com K6..."
+          k6 run --summary-export=summary.json load_test.js
+
+      - name: Upload do relatório (summary.json)
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary
+          path: summary.json
