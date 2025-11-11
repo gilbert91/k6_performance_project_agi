@@ -28,10 +28,15 @@ jobs:
       - name: Executar teste de performance
         run: |
           echo "Rodando teste de carga com K6..."
-          k6 run --summary-export=summary.json load_test.js
+          k6 run --summary-export=summary.json src/tests/load_test.js
 
-      - name: Upload do relatório (summary.json)
-        uses: actions/upload-artifact@v4
-        with:
-          name: k6-summary
-          path: summary.json
+      - name: Executar teste de pico
+        run: |
+          echo "Rodando teste de pico com K6..."
+          k6 run --summary-export=summary.json src/tests/spike_test.js
+
+      # - name: Upload do relatório (summary.json)
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: k6-summary
+      #     path: summary.json
